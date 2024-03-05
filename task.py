@@ -51,13 +51,21 @@ class Operator:
     # Implement the method
     def applicable(self, state):
         """
-        Operators are applicable when their set of preconditions is a subset
+        Operators are applicable when their set of preconditions is a subset --> isSubset
         of the predicates that are true in "state".
 
         @return True if the operator's preconditions is a subset of the state,
                 False otherwise
         """
-        return None # remove after implementing the method
+        
+        intersection = frozenset.intersection(self.preconditions, state)
+        if len(intersection) == len(self.preconditions):
+            isSubset = True # @return True if the operator's preconditions is a subset of the state
+        else:
+            isSubset = False
+
+        return isSubset  # remove after implementing the method
+        
 
     # ---- Step 2 ----
     # Implement the method
@@ -74,8 +82,15 @@ class Operator:
         @param state The state that the operator should be applied to
         @return A new state (set of predicates) after the application of the
                 operator
+        
+        e.g. idea
+        newState = set(['element1', 'element2'])
+        add_effects = set(['element2', 'element3'])
         """
-        return None # remove after implementing the method
+        
+        newState = state - self.del_effects
+        newState = newState | self.add_effects
+        return newState 
 
     def __eq__(self, other):
         return (
@@ -132,7 +147,16 @@ class Task:
         @param state A state
         @return True if all the goals are reached, False otherwise
         """
-        return None # remove after implementing the method
+        
+        intersection = frozenset.intersection(self.goals, state)
+        if len(intersection) == len(self.goals):
+            reachedGoal = True
+        else:
+            reachedGoal = False
+        return reachedGoal
+        
+        
+        
 
     # ---- Step 4 ----
     # Implement the method
@@ -150,7 +174,16 @@ class Task:
         operator and "new_state" the state that results when "op" is applied
         in state "state".
         """
-        return [] # remove after implementing the method
+        
+        nextStates = []
+        for operator in self.operators:
+            if operator.applicable(state):
+                newState = operator.apply(state)
+                nextStates.append((operator, newState ))
+        return nextStates
+    
+    
+        
 
     def __str__(self):
         s = "Task {0}\n  Vars:  {1}\n  Init:  {2}\n  Goals: {3}\n  Ops:   {4}"
